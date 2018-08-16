@@ -1,0 +1,21 @@
+{
+  "name": "wcpp",
+  "version": "1.0.0",
+  "description": "C++ for JavaScript",
+  "main": "index.js",
+  "bin": {
+    "wcpp": "./compile.js"
+  },
+  "scripts": {
+    "test": "nodemon test.js"
+  },
+  "keywords": [
+    "C++",
+    "cpp",
+    "wasm",
+    "webassembly"
+  ],
+  "author": "Brandon Dyer",
+  "license": "MIT",
+  "dependencies": {}
+}
