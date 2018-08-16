@@ -6,6 +6,11 @@ const fs = require('fs')
 const walk = require('./util/walk')
 
 walk('.').then(dirs => {
+  if (!dirs.includes(process.cwd() + '/package.json')) {
+    console.log('This is not the root of a node package.')
+    console.log('Please run in a directory with a `package.json` file.')
+    return
+  }
   for (let i in dirs) {
     const dir = dirs[i].replace(process.cwd(), '')
     if (dir.endsWith('.cpp') && !dir.endsWith('wcpp-temp.cpp')) {

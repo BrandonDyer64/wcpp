@@ -9,8 +9,16 @@
   "scripts": {
     "test": "nodemon test.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/brandondyer64/wcpp.git"
+  },
   "keywords": ["C++", "cpp", "wasm", "webassembly"],
   "author": "Brandon Dyer",
   "license": "MIT",
+  "bugs": {
+    "url": "https://gitlab.com/brandondyer64/wcpp/issues"
+  },
+  "homepage": "https://gitlab.com/brandondyer64/wcpp#README",
   "dependencies": {}
 }
