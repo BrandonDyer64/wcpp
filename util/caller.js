@@ -2,10 +2,11 @@
 
 function getCallerDir(shift = 1) {
   var stack = getStack()
-
   // Return caller's caller
-  return /\(([^)]+)\)/
-    .exec(stack[shift].toString())[1]
+  const fileAndLines = stack[shift].toString().includes('(')
+    ? /\(([^)]+)\)/.exec(stack[shift].toString())[1]
+    : stack[shift].toString()
+  return fileAndLines
     .split(':')[0]
     .split('/')
     .slice(0, -1)

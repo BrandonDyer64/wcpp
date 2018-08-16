@@ -8,6 +8,14 @@ Using the power of WebAssebly, wcpp projects run both in node and on the web.
 npm i -g wcpp
 ```
 
+## Installing Emscripten
+
+WCPP comes with an Emscripten installer and will automatically source environment variables upon comile.
+
+```bash
+$ wcpp-install
+```
+
 ## A C++ File
 
 ```cpp
@@ -18,13 +26,15 @@ export int addTwo(int a, int b) {
 }
 ```
 
-We need `export` to tell our compiler to make this function available to node.
+We need `export` to tell our compiler to make this function available to JavaScript.
 
 To compile all of our C/C++ files to wasm, we enter our project root and run:
 
 ```bash
 $ wcpp
 ```
+
+The first time running this command will be a bit slow.
 
 You should see a list of C/C++ files that have been compiled.
 
@@ -59,7 +69,7 @@ require('wcpp')('./addTwo.cpp').then(addTwo => {
 })
 ```
 
-## Function as a Module
+## Use Functions as Modules
 
 We can make our function into a module by naming the function `module`
 
@@ -83,3 +93,26 @@ const addTwo = await require('wcpp')('./addTwo.cpp')
 console.log(addTwo(2, 3))
 console.log(addTwo.timesTwo(2, 3)) // Our other function
 ```
+
+## Optimizing
+
+Running `wcpp` is usually enough in testing, but when your project is ready to
+go public, you may want to use the `--release` flag.
+
+### Release Mode
+
+```
+$ wcpp --release
+```
+
+This will run the compiler at full optimize mode. It will shrink the js includer
+and wasm file tremendously, and apply asm.js optimizations.
+
+### Custom Optimization Level
+
+```
+$ wcpp optimization=3
+```
+
+This will set the compiler flag `-O3`. For other flags, view
+[this](https://kripken.github.io/emscripten-site/docs/tools_reference/emcc.html#emcc-compiler-optimization-options) page.

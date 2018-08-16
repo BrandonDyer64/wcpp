@@ -1,9 +1,30 @@
 #!/usr/bin/env node
 
+const process = require('process')
 const cp = require('child_process')
 const fs = require('fs')
 
 const walk = require('./util/walk')
+const homedir = require('os').homedir()
+
+const defaultConfig = {
+  release: false,
+  optimization: '-O1'
+}
+
+for (var i = 2; i < process.argv.length; i++) {
+  const argv = process.argv[i]
+  let params = argv.split('=')
+  switch (params[0]) {
+    case '--release':
+      defaultConfig.release = true
+      defaultConfig.optimization = `-O3`
+      break
+    case 'optimization':
+      defaultConfig.optimization = `-O${params[1]}`
+      break
+  }
+}
 
 walk('.').then(dirs => {
   if (!dirs.includes(process.cwd() + '/package.json')) {
@@ -46,19 +67,27 @@ walk('.').then(dirs => {
       }
       functions = functions.join(',')
       const newData = lines.join('\n')
-      fs.writeFileSync(`./wcpp-temp.cpp`, newData, 'utf8')
-      const command = `emcc ./wcpp-temp.cpp -o ./wasm${newFile} -s EXPORTED_FUNCTIONS="[${functions}]"`
-      const result = cp.exec(command, (err, stdout, stderr) => {
-        if (err) {
-          console.log(err)
+      const tempFile = 'temp' + dir.replace(new RegExp('/', 'g'), '.')
+      fs.writeFileSync(`./${tempFile}`, newData, 'utf8')
+      const command =
+        `source ${homedir}/.wcpp/emsdk/emsdk_env.sh; ` +
+        `emcc ./${tempFile} ` +
+        `-o ./wasm${newFile} ` +
+        `-s EXPORTED_FUNCTIONS="[${functions}]" ` +
+        `${defaultConfig.optimization}`
+      const result = cp.exec(
+        command,
+        { shell: '/bin/bash' },
+        (err, stdout, stderr) => {
+          if (err) {
+            console.log(err)
+          }
+          if (stderr) {
+            console.log(stderr)
+          }
+          fs.unlinkSync(`./${tempFile}`)
         }
-        if (stdout) {
-          console.log(stdout)
-        }
-        if (stderr) {
-          console.log(stderr)
-        }
-      })
+      )
     }
   }
 })
