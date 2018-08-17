@@ -10,7 +10,7 @@ npm i -g wcpp
 
 ## Installing Emscripten
 
-WCPP comes with an Emscripten installer and will automatically source environment variables upon comile.
+WCPP comes with an Emscripten installer and will automatically source environment variables upon compile.
 
 ```bash
 $ wcpp-install
