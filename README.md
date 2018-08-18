@@ -2,7 +2,7 @@
 
 A node module to make writing C/C++ in JavaScript not painful.
 
-Using the power of WebAssembly, wcpp projects run both in Node and on the web.
+Using the power of WebAssembly, WCPP projects run both in Node and on the web.
 
 ```bash
 npm i -g wcpp
@@ -50,7 +50,7 @@ const ourModule = require('./addTwo.cpp')
 console.log(ourModule.addTwo(2, 3))
 ```
 
-If you want to both use wcpp in the web and include a large C++ file, you'll
+If you want to both use WCPP in the web and include a large C++ file, you'll
 need to use it asynchronously.
 
 We could put this in an anonymous async function:
