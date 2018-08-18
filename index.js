@@ -3,6 +3,8 @@ const path = require('path')
 const fs = require('fs')
 const util = require('util')
 
+const ENVIRONMENT_IS_WEB = typeof window === 'object'
+
 function toArrayBuffer(buf) {
   var ab = new ArrayBuffer(buf.length)
   var view = new Uint8Array(ab)
@@ -12,9 +14,27 @@ function toArrayBuffer(buf) {
   return ab
 }
 
+const cppExportCache = {}
+
+// Override require to accept C++ files
+const Module = require('module')
+const originalRequire = Module.prototype.require
+
+Module.prototype.require = function() {
+  const file = arguments[0]
+  if (file.endsWith('.cpp')) {
+    return module.exports(file, 4)
+  } else {
+    return originalRequire.apply(this, arguments)
+  }
+}
+
 // Load as js
-module.exports = file => {
-  const callerDir = getCallerDir(2)
+module.exports = (file, shift = 2) => {
+  if (!file) {
+    return
+  }
+  const callerDir = getCallerDir(shift)
   file = (file + '%').replace('.cpp%', '').replace('%', '')
   const module = require(`${callerDir}/wasm/${file}.js`)
   let exports = {}
@@ -35,8 +55,28 @@ module.exports = file => {
   })
 }
 
+module.exports.sync = () => {
+  if (ENVIRONMENT_IS_WEB) {
+    console.error(
+      'It is not reccomended to use wcpp.sync() in a web environment.',
+      'Large files will not be imported.'
+    )
+  }
+  const Module = require('module')
+
+  Module.prototype.require = function() {
+    const file = arguments[0]
+    if (file.endsWith('.cpp')) {
+      return requireSync(file, 4)
+    } else {
+      return originalRequire.apply(this, arguments)
+    }
+  }
+}
+
 // Load file synchronously
-module.exports.w = file => {
+const requireSync = (file, shift = 2) => {
+  file = (file + '%').replace('.cpp%', '').replace('%', '')
   const env = {
     memoryBase: 0,
     tableBase: 0,
@@ -49,13 +89,28 @@ module.exports.w = file => {
     })
   }
 
-  const callerDir = getCallerDir()
+  const callerDir = getCallerDir(shift)
   const source = fs.readFileSync(`${callerDir}/wasm/${file}.wasm`)
+  if (source in cppExportCache) {
+    return cppExportCache[source]
+  }
   const module = new WebAssembly.Module(new Uint8Array(source), {
     env: env
   })
   const instance = new WebAssembly.Instance(module)
-  return instance.exports
+  let exports = {}
+  for (let i in instance.exports) {
+    if (i.toString() == '_module') {
+      exports = instance.exports[i]
+    }
+  }
+  cppExportCache[source] = exports
+  for (let i in instance.exports) {
+    if (i.toString().startsWith('_')) {
+      exports[i.substr(1)] = instance.exports[i]
+    }
+  }
+  return exports
 }
 
 // Load file asynchronously

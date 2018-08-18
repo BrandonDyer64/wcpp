@@ -38,17 +38,20 @@ The first time running this command will be a bit slow.
 
 You should see a list of C/C++ files that have been compiled.
 
-## Some JavaScript
+## Our JavaScript
 
 All we have to do now is require our C++ file the same way we would require a JS file.
 
 ```js
-const ourModule = await require('wcpp')('./addTwo.cpp')
+require('wcpp')
+
+const ourModule = require('./addTwo.cpp')
 
 console.log(ourModule.addTwo(2, 3))
 ```
 
-Note the `await`. `require('wcpp')` returns a promise.
+If you want to both use wcpp in the web and inculde a lare C++ file, you'll
+need to use it asynchronously.
 
 We could put this in an anonymous async function:
 
@@ -88,31 +91,10 @@ export int timesTwo(int a, int b) { // We can still make other functions
 ```js
 // JavaScript
 
-const addTwo = await require('wcpp')('./addTwo.cpp')
+require('wcpp')
+
+const addTwo = await require('./addTwo.cpp')
 
 console.log(addTwo(2, 3))
 console.log(addTwo.timesTwo(2, 3)) // Our other function
 ```
-
-## Optimizing
-
-Running `wcpp` is usually enough in testing, but when your project is ready to
-go public, you may want to use the `--release` flag.
-
-### Release Mode
-
-```
-$ wcpp --release
-```
-
-This will run the compiler at full optimize mode. It will shrink the js includer
-and wasm file tremendously, and apply asm.js optimizations.
-
-### Custom Optimization Level
-
-```
-$ wcpp optimization=3
-```
-
-This will set the compiler flag `-O3`. For other flags, view
-[this](https://kripken.github.io/emscripten-site/docs/tools_reference/emcc.html#emcc-compiler-optimization-options) page.

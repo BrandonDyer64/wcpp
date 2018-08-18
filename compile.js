@@ -9,7 +9,7 @@ const homedir = require('os').homedir()
 
 const defaultConfig = {
   release: false,
-  optimization: '-O1'
+  optimization: '-O3'
 }
 
 for (var i = 2; i < process.argv.length; i++) {
@@ -20,6 +20,8 @@ for (var i = 2; i < process.argv.length; i++) {
       defaultConfig.release = true
       defaultConfig.optimization = `-O3`
       break
+    case '--no-optimize':
+      defaultConfig.optimization = `-O1`
     case 'optimization':
       defaultConfig.optimization = `-O${params[1]}`
       break
