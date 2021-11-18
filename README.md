@@ -1,5 +1,8 @@
 # WCPP
 
+## ⛔️ DO NOT USE ⛔️
+**THIS PROJECT IS NO LONGER MAINTAINED**
+
 A node module to make writing C/C++ in JavaScript not painful.
 
 Using the power of WebAssembly, WCPP projects run both in Node and on the web.
